@@ -62,20 +62,6 @@ class Request {
 }
 
 class Auth extends Request {
-  // Basic Authentication
-  basicAuth(username, password) {
-    const url = `${this.baseUrl}/api/v1/auth/token`;
-    const text = `${username}:${password}`;
-    const credential = Utilities.base64Encode(text);
-    const headers = {
-      Authorization: `Basic ${credential}`,
-      Accept: 'application/json'
-    };
-    const payload = {};
-    const key = 'token';
-    return { url, headers, payload, key };
-  }
-
   // API Client Authentication
   apiClientAuth(clientId, clientSecret) {
     const url = `${this.baseUrl}/api/oauth/token`;
@@ -96,18 +82,10 @@ class Auth extends Request {
     const properties = PropertiesService.getScriptProperties().getProperties();
     const clientId = properties.CLIENT_ID;
     const clientSecret = properties.CLIENT_SECRET;
-    const username = properties.USERNAME;
-    const password = properties.PASSWORD;
-
-    let auth;
-    if (isDefined(clientId) && isDefined(clientSecret)) {
-      auth = this.apiClientAuth(clientId, clientSecret);
-    } else if (isDefined(username) && isDefined(password)) {
-      auth = this.basicAuth(username, password);
-    } else {
+    if (!(isDefined(clientId) && isDefined(clientSecret))) {
       alertNotSetProperty();
     }
-
+    const auth = this.apiClientAuth(clientId, clientSecret);
     const res = this.request('post', auth.url, auth.headers, auth.payload);
     return res[auth.key];
   }
