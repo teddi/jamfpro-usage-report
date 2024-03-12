@@ -30,8 +30,9 @@ class Resource {
       is_smart: null,
       category: null,
       enabled: null,
-      scope_groups: null,
-      exclusion_groups: null
+      scope_targets: null,
+      scope_limitations: null,
+      scope_exclusions: null
     };
   }
 
@@ -49,12 +50,24 @@ class Resource {
     this.addResources('computer_group', records);
   }
 
-  makeNames(records) {
+  makeNameList(type, records) {
     const names = [];
     for (const r of records) {
       names.push(r.name);
     }
-    return names.join(', ');
+    return `${type}: [${names.join(', ')}]`;
+  }
+
+  makeScopeList(scope) {
+    const scopes = [];
+    for (const key of Object.keys(scope)) {
+      if (typeof scope[key] === 'boolean' && scope[key]) {
+        scopes.push(key);
+      } else if (Array.isArray(scope[key]) && scope[key].length > 0) {
+        scopes.push(this.makeNameList(key, scope[key]));
+      }
+    }
+    return scopes.join(', ');
   }
 
   getPolicies() {
@@ -68,8 +81,9 @@ class Resource {
         name: r.general.name,
         category: r.general.category.name,
         enabled: r.general.enabled,
-        scope_groups: this.makeNames(r.scope.computer_groups),
-        exclusion_groups: this.makeNames(r.scope.exclusions.computer_groups)
+        scope_targets: this.makeScopeList(r.scope),
+        scope_limitations: this.makeScopeList(r.scope.limitations),
+        scope_exclusions: this.makeScopeList(r.scope.exclusions)
       });
     }
     this.addResources('policy', records);
@@ -85,8 +99,9 @@ class Resource {
         id: r.general.id,
         name: r.general.name,
         category: r.general.category.name,
-        scope_groups: this.makeNames(r.scope.computer_groups),
-        exclusion_groups: this.makeNames(r.scope.exclusions.computer_groups)
+        scope_targets: this.makeScopeList(r.scope),
+        scope_limitations: this.makeScopeList(r.scope.limitations),
+        scope_exclusions: this.makeScopeList(r.scope.exclusions)
       });
     }
     this.addResources('configuration_profile', records);
