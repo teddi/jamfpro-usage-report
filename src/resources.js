@@ -1,3 +1,6 @@
+/**
+ * Update the Jamf Pro resources sheet
+ */
 function updateResources() { // eslint-disable-line no-unused-vars
   console.log('Update Resources');
   const resource = new Resource();
@@ -8,6 +11,9 @@ function updateResources() { // eslint-disable-line no-unused-vars
   spreadsheet.writeDataToSheet(resource.items);
 }
 
+/**
+ * Class representing a resource
+ */
 class Resource {
   constructor() {
     // eslint-disable-next-line no-undef
@@ -22,6 +28,11 @@ class Resource {
     this.getComputerPrestages();
   }
 
+  /**
+   * Resource item template
+   * @param {string} type Resource type
+   * @returns item
+   */
   template(type) {
     return {
       type,
@@ -36,6 +47,11 @@ class Resource {
     };
   }
 
+  /**
+   * Add resources to items
+   * @param {string} type Resource type
+   * @param {Array} records Resources
+   */
   addResources(type, records) {
     for (const record of records) {
       const item = this.template(type);
@@ -44,12 +60,21 @@ class Resource {
     }
   }
 
+  /**
+   * Get all computer groups
+   */
   getComputerGroups() {
     console.log('Get Computer Groups');
     const records = this.jamf.getComputerGroups();
     this.addResources('computer_group', records);
   }
 
+  /**
+   * Make a list of names
+   * @param {string} type Resource type
+   * @param {Array} records Resources
+   * @returns {string} Type name + Comma-separated list of names
+   */
   makeNameList(type, records) {
     const names = [];
     for (const r of records) {
@@ -58,6 +83,11 @@ class Resource {
     return `${type}: [${names.join(', ')}]`;
   }
 
+  /**
+   * Make a list of scope
+   * @param {Object} scope Scope
+   * @returns {string} Comma-separated list of scopes
+   */
   makeScopeList(scope) {
     const scopes = [];
     for (const key of Object.keys(scope)) {
@@ -70,6 +100,9 @@ class Resource {
     return scopes.join(', ');
   }
 
+  /**
+   * Get all policies
+   */
   getPolicies() {
     console.log('Get Policies');
     const records = [];
@@ -89,6 +122,9 @@ class Resource {
     this.addResources('policy', records);
   }
 
+  /**
+   * Get all computer configuration profiles
+   */
   getConfigurationProfiles() {
     console.log('Get Configuration Profiles');
     const records = [];
@@ -107,6 +143,9 @@ class Resource {
     this.addResources('configuration_profile', records);
   }
 
+  /**
+   * Get all packages
+   */
   getPackages() {
     console.log('Get Packages');
     const records = [];
@@ -122,6 +161,9 @@ class Resource {
     this.addResources('package', records);
   }
 
+  /**
+   * Get all scripts
+   */
   getScripts() {
     console.log('Get Scripts');
     const records = [];
@@ -137,6 +179,9 @@ class Resource {
     this.addResources('script', records);
   }
 
+  /**
+   * Get all computer prestages
+   */
   getComputerPrestages() {
     console.log('Get Computer Prestages');
     const records = [];

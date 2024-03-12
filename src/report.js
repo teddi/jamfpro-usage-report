@@ -1,3 +1,6 @@
+/**
+ * Update the Jamf Pro resources usage report
+ */
 function updateReport() { // eslint-disable-line no-unused-vars
   console.log('Update Resources');
   const report = new UsageReport();
@@ -8,6 +11,9 @@ function updateReport() { // eslint-disable-line no-unused-vars
   spreadsheet.writeDataToSheet(report.items);
 }
 
+/**
+ * Class representing a usage report
+ */
 class UsageReport {
   constructor() {
     // eslint-disable-next-line no-undef
@@ -20,6 +26,12 @@ class UsageReport {
     this.getComputerPrestages();
   }
 
+  /**
+   * Usage item template
+   * @param {string} type Resource type
+   * @param {string} usageType Usage resource type
+   * @returns {Object} item
+   */
   template(type, usageType) {
     return {
       type,
@@ -34,6 +46,13 @@ class UsageReport {
     };
   }
 
+  /**
+   * Retrieve items used in smart computer group's criteria
+   * @param {Object} group Target computer group
+   * @param {Object} criteria Smart computer group's criteria
+   * @param {string} type Usage resource type
+   * @returns {Object} item
+   */
   getCriteriaItem(group, criteria, type) {
     const item = this.template('computer_group', type);
     Object.assign(item, {
@@ -45,6 +64,9 @@ class UsageReport {
     return item;
   }
 
+  /**
+   * Get all computer groups
+   */
   getComputerGroups() {
     console.log('Get Computer Groups');
     const records = this.jamf.getComputerGroups();
@@ -78,6 +100,14 @@ class UsageReport {
     }
   }
 
+  /**
+   * Add usages to the items
+   * @param {Array} usages Usages
+   * @param {Object} general General resource
+   * @param {string} type Resource type
+   * @param {string} usageType Usage resource type
+   * @param {string} usageLocation Usage location
+   */
   addUsages(usages, general, type, usageType, usageLocation = null) {
     for (const usage of usages) {
       const item = this.template(type, usageType);
@@ -94,6 +124,9 @@ class UsageReport {
     }
   }
 
+  /**
+   * Get all policies
+   */
   getPolicies() {
     console.log('Get Policies');
     const records = this.jamf.getPolicies();
@@ -133,6 +166,9 @@ class UsageReport {
     }
   }
 
+  /**
+   * Get all computer configuration profiles
+   */
   getConfigurationProfiles() {
     console.log('Get Configuration Profiles');
     const records = this.jamf.getConfigurationProfiles();
@@ -158,6 +194,9 @@ class UsageReport {
     }
   }
 
+  /**
+   * Get all computer prestages
+   */
   getComputerPrestages() {
     console.log('Get Computer Prestages');
     const records = this.jamf.getComputerPrestages();

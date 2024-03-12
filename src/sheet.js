@@ -1,3 +1,6 @@
+/**
+ * Class to handle Google Sheets
+ */
 class Spreadsheet { // eslint-disable-line no-unused-vars
   constructor(sheetName = null) {
     this.spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
@@ -16,6 +19,11 @@ class Spreadsheet { // eslint-disable-line no-unused-vars
     }
   }
 
+  /**
+   * Write data to sheets in batches
+   * @param {Object} writeData Data to write
+   * @param {number} headerRowPos Header row position (default:1)
+   */
   writeDataToSheet(writeData, headerRowPos = 1) {
     const data = [];
 

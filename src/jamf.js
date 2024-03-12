@@ -1,19 +1,36 @@
-// Determining if a property is defined
+/**
+ * Determine if a property is defined
+ * @param {*} property
+ * @returns {boolean}
+ */
 function isDefined(property) {
   return (typeof property !== 'undefined');
 }
 
-// Exit with alert if property is not defined
+/**
+ * Alert if property is not defined
+ */
 function alertNotSetProperty() {
   throw new Error('Property is not set');
 }
 
+/**
+ * Class representing a request
+ * */
 class Request {
   constructor(baseUrl, token = null) {
     this.baseUrl = baseUrl;
     this.token = token;
   }
 
+  /**
+   * Send a request to a web service
+   * @param {string} method HTTP method
+   * @param {string} url Endpoint URL
+   * @param {Object} headers Request headers
+   * @param {Object} payload Request payload
+   * @returns Response
+   */
   request(method, url, headers = this.headers(), payload = null) {
     let res = {};
     try {
@@ -34,7 +51,10 @@ class Request {
     return res;
   }
 
-  // Common Headers
+  /**
+   * Get common headers
+   * @returns {Object} Headers
+   */
   headers() {
     return {
       Authorization: `Bearer ${this.token}`,
@@ -42,7 +62,12 @@ class Request {
     };
   }
 
-  // Join URL with Query parameters
+  /**
+   * Join URL with Query parameters
+   * @param {string} baseUrl Base URL
+   * @param {Object} params Query parameters
+   * @returns Concatenated URL
+   */
   joinUrlWithParams(baseUrl, params) {
     let url = baseUrl;
     const queryString = Object.keys(params).map(function(key) {
@@ -55,14 +80,26 @@ class Request {
     return url;
   }
 
-  // URL
+  /**
+   * Join URL with path
+   * @param {string} path URL path
+   * @returns Concatenated URL
+   */
   url(path) {
     return `${this.baseUrl}/${path}`;
   }
 }
 
+/**
+ * Class representing a request to the Jamf Pro Authentication API
+ */
 class Auth extends Request {
-  // API Client Authentication
+  /**
+   * API Client Authentication
+   * @param {string} clientId Client ID
+   * @param {string} clientSecret Client Secret
+   * @returns {Object} Authentication
+   */
   apiClientAuth(clientId, clientSecret) {
     const url = `${this.baseUrl}/api/oauth/token`;
     const headers = {
@@ -77,7 +114,10 @@ class Auth extends Request {
     return { url, headers, payload, key };
   }
 
-  // Get Access Token
+  /**
+   * Get Access Token
+   * @returns {string} Access Token
+   */
   getToken() {
     const properties = PropertiesService.getScriptProperties().getProperties();
     const clientId = properties.CLIENT_ID;
@@ -91,89 +131,118 @@ class Auth extends Request {
   }
 }
 
+/**
+ * Class representing a request to the Jamf Classic API
+ */
 class ClassicApi extends Request {
-  // URL
   url(path, params) {
     const url = `${this.baseUrl}/JSSResource/${path}`;
     return this.joinUrlWithParams(url, params);
   }
 
-  // List
   list(path, params) {
     const url = this.url(path, params);
     return this.request('get', url);
   }
 
-  // Get
   get(path, id, params) {
     const path_ = `${path}/id/${id}`;
     const url = this.url(path_, params);
     return this.request('get', url);
   }
 
-  // Computer Group
-  // https://developer.jamf.com/jamf-pro/reference/findcomputergroups
+  /**
+   * Get all computer groups
+   * https://developer.jamf.com/jamf-pro/reference/findcomputergroups
+   */
   getComputerGroups(params = {}) {
     return this.list('computergroups', params).computer_groups;
   }
 
-  // https://developer.jamf.com/jamf-pro/reference/findcomputergroupsbyid
+  /**
+   * Get computer group
+   * https://developer.jamf.com/jamf-pro/reference/findcomputergroupsbyid
+   */
   getComputerGroup(id, params = {}) {
     return this.get('computergroups', id, params).computer_group;
   }
 
-  // Policy
-  // https://developer.jamf.com/jamf-pro/reference/findpolicies
+  /**
+   * Get all policies
+   * https://developer.jamf.com/jamf-pro/reference/findpolicies
+   */
   getPolicies(params = {}) {
     return this.list('policies', params).policies;
   }
 
-  // https://developer.jamf.com/jamf-pro/reference/findpoliciesbyid
+  /**
+   * Get policy
+   * https://developer.jamf.com/jamf-pro/reference/findpoliciesbyid
+   */
   getPolicy(id, params = {}) {
     return this.get('policies', id, params).policy;
   }
 
-  // Package
-  // https://developer.jamf.com/jamf-pro/reference/findpackages
+  /**
+   * Get all packages
+   * https://developer.jamf.com/jamf-pro/reference/findpackages
+   */
   getPackages(params = {}) {
     return this.list('packages', params).packages;
   }
 
-  // https://developer.jamf.com/jamf-pro/reference/findpackagesbyid
+  /**
+   * Get package
+   * https://developer.jamf.com/jamf-pro/reference/findpackagesbyid
+   */
   getPackage(id, params = {}) {
     return this.get('packages', id, params).package;
   }
 
-  // Script
-  // https://developer.jamf.com/jamf-pro/reference/findscripts
+  /**
+   * Get all scripts
+   * https://developer.jamf.com/jamf-pro/reference/findscripts
+   */
   getScripts(params = {}) {
     return this.list('scripts', params).scripts;
   }
 
-  // https://developer.jamf.com/jamf-pro/reference/findscriptsbyid
+  /**
+   * Get script
+   * https://developer.jamf.com/jamf-pro/reference/findscriptsbyid
+   */
   getScript(id, params = {}) {
     return this.get('scripts', id, params).script;
   }
 
-  // Configuration Profile
-  // https://developer.jamf.com/jamf-pro/reference/findosxconfigurationprofiles
+  /**
+   * Get all computer configuration profiles
+   * https://developer.jamf.com/jamf-pro/reference/findosxconfigurationprofiles
+   */
   getConfigurationProfiles(params = {}) {
     return this.list('osxconfigurationprofiles', params).os_x_configuration_profiles;
   }
 
-  // https://developer.jamf.com/jamf-pro/reference/findosxconfigurationprofilesbyid
+  /**
+   * Get computer configuration profile
+   * https://developer.jamf.com/jamf-pro/reference/findosxconfigurationprofilesbyid
+   */
   getConfigurationProfile(id, params = {}) {
     return this.get('osxconfigurationprofiles', id, params).os_x_configuration_profile;
   }
 }
 
+/**
+ * Class representing a request to the Jamf Pro API
+ */
 class JamfProApi extends Request {
-  // URL
   url(path, version) {
     return `${this.baseUrl}/api/${version}/${path}`;
   }
 
-  // Pagination
+  /**
+   * Retrieve all of the paginated data by repeated requests
+   */
   pagination(url, page, params, data_ = []) {
     const params_ = Object.assign(params, { page });
     const url_ = this.joinUrlWithParams(url, params_);
@@ -185,31 +254,37 @@ class JamfProApi extends Request {
     return data;
   }
 
-  // List
   list(path, version, params) {
     const url = this.url(path, version);
     return this.pagination(url, 0, params);
   }
 
-  // Get
   get(path, version, id, params) {
     const path_ = `${path}/${id}`;
     const url = this.joinUrlWithParams(this.url(path_, version), params);
     return this.request('get', url);
   }
 
-  // Computer Prestage
-  // https://developer.jamf.com/jamf-pro/reference/get_v3-computer-prestages
+  /**
+   * Get all computer prestages
+   * https://developer.jamf.com/jamf-pro/reference/get_v3-computer-prestages
+   */
   getComputerPrestages(params = {}) {
     return this.list('computer-prestages', 'v3', params);
   }
 
-  // https://developer.jamf.com/jamf-pro/reference/get_v3-computer-prestages-id
+  /**
+   * Get computer prestage
+   * https://developer.jamf.com/jamf-pro/reference/get_v3-computer-prestages-id
+   */
   getComputerPrestage(id, params = {}) {
     return this.get('computer-prestages', 'v3', id, params);
   }
 }
 
+/**
+ * Class representing a Jamf Client
+ */
 class JamfClient { // eslint-disable-line no-unused-vars
   constructor() {
     const properties = PropertiesService.getScriptProperties().getProperties();
@@ -225,56 +300,62 @@ class JamfClient { // eslint-disable-line no-unused-vars
     this.pro = new JamfProApi(baseUrl, token);
   }
 
-  // Computer Group
+  /** Get all computer groups */
   getComputerGroups(params = {}) {
     return this.classic.getComputerGroups(params);
   }
 
+  /** Get computer group */
   getComputerGroup(id, params = {}) {
     return this.classic.getComputerGroup(id, params);
   }
 
-  // Policy
+  /** Get all policies */
   getPolicies(params = {}) {
     return this.classic.getPolicies(params);
   }
 
+  /** Get policy */
   getPolicy(id, params = {}) {
     return this.classic.getPolicy(id, params);
   }
 
-  // Package
+  /** Get all packages */
   getPackages(params = {}) {
     return this.classic.getPackages(params);
   }
 
+  /** Get package */
   getPackage(id, params = {}) {
     return this.classic.getPackage(id, params);
   }
 
-  // Script
+  /** Get all scripts */
   getScripts(params = {}) {
     return this.classic.getScripts(params);
   }
 
+  /** Get script */
   getScript(id, params = {}) {
     return this.classic.getScript(id, params);
   }
 
-  // Configuration Profile
+  /** Get all computer configuration profiles */
   getConfigurationProfiles(params = {}) {
     return this.classic.getConfigurationProfiles(params);
   }
 
+  /** Get computer configuration profile */
   getConfigurationProfile(id, params = {}) {
     return this.classic.getConfigurationProfile(id, params);
   }
 
-  // Computer Prestage
+  /** Get all computer prestages */
   getComputerPrestages(params = {}) {
     return this.pro.getComputerPrestages(params);
   }
 
+  /** Get computer prestage */
   getComputerPrestage(id, params = {}) {
     return this.pro.getComputerPrestage(id, params);
   }
