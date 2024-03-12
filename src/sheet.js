@@ -5,6 +5,12 @@ class Spreadsheet { // eslint-disable-line no-unused-vars
     // Set active sheet if sheet name is not specified
     if (sheetName) {
       this.sheet = this.spreadsheet.getSheetByName(sheetName);
+
+      // If sheet does not exist, create new sheet
+      if (!this.sheet) {
+        this.sheet = this.spreadsheet.insertSheet();
+        this.sheet.setName(sheetName);
+      }
     } else {
       this.sheet = this.spreadsheet.getActiveSheet();
     }
