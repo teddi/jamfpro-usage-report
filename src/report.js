@@ -1,13 +1,14 @@
 /**
- * Update the Jamf Pro resources usage report
+ * Update the Jamf Pro objects usage report
  */
 function updateReport() { // eslint-disable-line no-unused-vars
-  console.log('Update Resources');
+  // eslint-disable-next-line no-undef
+  const spreadsheet = new Spreadsheet('Report');
+
+  console.log('Update Objects');
   const report = new UsageReport();
 
   console.log('Write data to sheet');
-  // eslint-disable-next-line no-undef
-  const spreadsheet = new Spreadsheet('Report');
   spreadsheet.writeDataToSheet(report.items);
 }
 
@@ -28,9 +29,9 @@ class UsageReport {
 
   /**
    * Usage item template
-   * @param {string} type Resource type
-   * @param {string} usageType Usage resource type
-   * @returns {Object} item
+   * @param {string} type Object type
+   * @param {string} usageType Usage object type
+   * @returns {Object} usage item
    */
   template(type, usageType) {
     return {
@@ -50,8 +51,8 @@ class UsageReport {
    * Retrieve items used in smart computer group's criteria
    * @param {Object} group Target computer group
    * @param {Object} criteria Smart computer group's criteria
-   * @param {string} type Usage resource type
-   * @returns {Object} item
+   * @param {string} type Usage object type
+   * @returns {Object} usage item
    */
   getCriteriaItem(group, criteria, type) {
     const item = this.template('computer_group', type);
@@ -103,9 +104,9 @@ class UsageReport {
   /**
    * Add usages to the items
    * @param {Array} usages Usages
-   * @param {Object} general General resource
-   * @param {string} type Resource type
-   * @param {string} usageType Usage resource type
+   * @param {Object} general General object
+   * @param {string} type Object type
+   * @param {string} usageType Usage object type
    * @param {string} usageLocation Usage location
    */
   addUsages(usages, general, type, usageType, usageLocation = null) {

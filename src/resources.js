@@ -1,24 +1,25 @@
 /**
- * Update the Jamf Pro resources sheet
+ * Update the Jamf Pro objects sheet
  */
-function updateResources() { // eslint-disable-line no-unused-vars
-  console.log('Update Resources');
-  const resource = new Resource();
+function updateObjects() { // eslint-disable-line no-unused-vars
+  // eslint-disable-next-line no-undef
+  const spreadsheet = new Spreadsheet('Objects');
+
+  console.log('Update Objects');
+  const jamfObj = new JamfObject();
 
   console.log('Write data to sheet');
-  // eslint-disable-next-line no-undef
-  const spreadsheet = new Spreadsheet('Resources');
-  spreadsheet.writeDataToSheet(resource.items);
+  spreadsheet.writeDataToSheet(jamfObj.objects);
 }
 
 /**
- * Class representing a resource
+ * Class representing a Jamf object
  */
-class Resource {
+class JamfObject {
   constructor() {
     // eslint-disable-next-line no-undef
     this.jamf = new JamfClient();
-    this.items = [];
+    this.objects = [];
 
     this.getComputerGroups();
     this.getPolicies();
@@ -29,9 +30,9 @@ class Resource {
   }
 
   /**
-   * Resource item template
-   * @param {string} type Resource type
-   * @returns item
+   * Object template
+   * @param {string} type Object type
+   * @returns object
    */
   template(type) {
     return {
@@ -48,15 +49,16 @@ class Resource {
   }
 
   /**
-   * Add resources to items
-   * @param {string} type Resource type
-   * @param {Array} records Resources
+   * Add records to objects
+   * @param {string} type Object type
+   * @param {Array} records Objects
    */
-  addResources(type, records) {
+  addObjects(type, records) {
     for (const record of records) {
-      const item = this.template(type);
-      Object.assign(item, record);
-      this.items.push(item);
+      const _obj = this.template(type);
+      // Merge the template and record
+      Object.assign(_obj, record);
+      this.objects.push(_obj);
     }
   }
 
@@ -66,13 +68,13 @@ class Resource {
   getComputerGroups() {
     console.log('Get Computer Groups');
     const records = this.jamf.getComputerGroups();
-    this.addResources('computer_group', records);
+    this.addObjects('computer_group', records);
   }
 
   /**
    * Make a list of names
-   * @param {string} type Resource type
-   * @param {Array} records Resources
+   * @param {string} type Object type
+   * @param {Array} records Objects
    * @returns {string} Type name + Comma-separated list of names
    */
   makeNameList(type, records) {
@@ -119,7 +121,7 @@ class Resource {
         scope_exclusions: this.makeScopeList(r.scope.exclusions)
       });
     }
-    this.addResources('policy', records);
+    this.addObjects('policy', records);
   }
 
   /**
@@ -140,7 +142,7 @@ class Resource {
         scope_exclusions: this.makeScopeList(r.scope.exclusions)
       });
     }
-    this.addResources('configuration_profile', records);
+    this.addObjects('configuration_profile', records);
   }
 
   /**
@@ -158,7 +160,7 @@ class Resource {
         category: r.category
       });
     }
-    this.addResources('package', records);
+    this.addObjects('package', records);
   }
 
   /**
@@ -176,7 +178,7 @@ class Resource {
         category: r.category
       });
     }
-    this.addResources('script', records);
+    this.addObjects('script', records);
   }
 
   /**
@@ -192,6 +194,6 @@ class Resource {
         name: r.displayName
       });
     }
-    this.addResources('computer_prestage', records);
+    this.addObjects('computer_prestage', records);
   }
 }
