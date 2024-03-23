@@ -27,6 +27,11 @@ class Spreadsheet { // eslint-disable-line no-unused-vars
   writeDataToSheet(writeData, headerRowPos = 1) {
     const data = [];
 
+    // Check if data is empty
+    if (writeData.length === 0) {
+      return;
+    }
+
     // Clear all data
     this.sheet.clear();
 
