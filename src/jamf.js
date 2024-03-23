@@ -152,6 +152,22 @@ class ClassicApi extends Request {
   }
 
   /**
+   * Get all categories
+   * https://developer.jamf.com/jamf-pro/reference/findcategories
+   */
+  getCategories(params = {}) {
+    return this.list('categories', params).categories;
+  }
+
+  /**
+   * Get category
+   * https://developer.jamf.com/jamf-pro/reference/findcategoriesbyid
+   */
+  getCategory(id, params = {}) {
+    return this.get('categories', id, params).category;
+  }
+
+  /**
    * Get all computer groups
    * https://developer.jamf.com/jamf-pro/reference/findcomputergroups
    */
@@ -230,6 +246,38 @@ class ClassicApi extends Request {
   getConfigurationProfile(id, params = {}) {
     return this.get('osxconfigurationprofiles', id, params).os_x_configuration_profile;
   }
+
+  /**
+   * Get all computer extension attributes
+   * https://developer.jamf.com/jamf-pro/reference/findcomputerextensionattributes
+   */
+  getExtensionAttributes(params = {}) {
+    return this.list('computerextensionattributes', params).computer_extension_attributes;
+  }
+
+  /**
+   * Get computer extension attribute
+   * https://developer.jamf.com/jamf-pro/reference/findcomputerextensionattributesbyid
+   */
+  getExtensionAttribute(id, params = {}) {
+    return this.get('computerextensionattributes', id, params).computer_extension_attribute;
+  }
+
+  /**
+   * Get all advanced computer searches
+   * https://developer.jamf.com/jamf-pro/reference/findadvancedcomputersearches
+   */
+  getAdvancedComputerSearches(params = {}) {
+    return this.list('advancedcomputersearches', params).advanced_computer_searches;
+  }
+
+  /**
+   * Get advanced computer search
+   * https://developer.jamf.com/jamf-pro/reference/findadvancedcomputersearchesbyid
+   */
+  getAdvancedComputerSearch(id, params = {}) {
+    return this.get('advancedcomputersearches', id, params).advanced_computer_search;
+  }
 }
 
 /**
@@ -300,6 +348,16 @@ class JamfClient { // eslint-disable-line no-unused-vars
     this.pro = new JamfProApi(baseUrl, token);
   }
 
+  /** Get all categories */
+  getCategories(params = {}) {
+    return this.classic.getCategories(params);
+  }
+
+  /** Get category */
+  getCategory(id, params = {}) {
+    return this.classic.getCategory(id, params);
+  }
+
   /** Get all computer groups */
   getComputerGroups(params = {}) {
     return this.classic.getComputerGroups(params);
@@ -348,6 +406,26 @@ class JamfClient { // eslint-disable-line no-unused-vars
   /** Get computer configuration profile */
   getConfigurationProfile(id, params = {}) {
     return this.classic.getConfigurationProfile(id, params);
+  }
+
+  /** Get all computer extension attributes */
+  getExtensionAttributes(params = {}) {
+    return this.classic.getExtensionAttributes(params);
+  }
+
+  /** Get computer extension attribute */
+  getExtensionAttribute(id, params = {}) {
+    return this.classic.getExtensionAttribute(id, params);
+  }
+
+  /** Get all advanced computer searches */
+  getAdvancedComputerSearches(params = {}) {
+    return this.classic.getAdvancedComputerSearches(params);
+  }
+
+  /** Get advanced computer search */
+  getAdvancedComputerSearch(id, params = {}) {
+    return this.classic.getAdvancedComputerSearch(id, params);
   }
 
   /** Get all computer prestages */

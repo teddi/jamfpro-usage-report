@@ -24,6 +24,7 @@ class UsageReport {
     this.getComputerGroups();
     this.getPolicies();
     this.getConfigurationProfiles();
+    this.getAdvancedComputerSearches();
     this.getComputerPrestages();
   }
 
@@ -48,17 +49,19 @@ class UsageReport {
   }
 
   /**
-   * Retrieve items used in smart computer group's criteria
-   * @param {Object} group Target computer group
-   * @param {Object} criteria Smart computer group's criteria
-   * @param {string} type Usage object type
+   * Retrieve item used in criteria
+   * @param {Object} id id
+   * @param {Object} name name
+   * @param {Object} criteria criteria
+   * @param {string} type object type
+   * @param {string} usageType Usage object type
    * @returns {Object} usage item
    */
-  getCriteriaItem(group, criteria, type) {
-    const item = this.template('computer_group', type);
+  getCriteriaItem(id, name, criteria, type, usageType) {
+    const item = this.template(type, usageType);
     Object.assign(item, {
-      id: group.id,
-      name: group.name,
+      id,
+      name,
       usage_location: `criteria:${(criteria.search_type).replace(/ /g, '_')}`,
       usage_name: criteria.value
     });
@@ -66,37 +69,50 @@ class UsageReport {
   }
 
   /**
+   * Retrieves items used in criteria
+   * @param {string} type Object type
+   * @param {Object} record Record
+   */
+  getCriteriaItems(type, record) {
+    for (const criteria of record.criteria) {
+      const id = record.id;
+      const name = record.name;
+
+      // Computer Group
+      if (criteria.name === 'Computer Group') {
+        this.items.push(this.getCriteriaItem(id, name, criteria, type, 'computer_group'));
+
+      // PreStage Enrollment
+      } else if (criteria.name === 'Enrollment Method: PreStage enrollment') {
+        this.items.push(this.getCriteriaItem(id, name, criteria, type, 'computer_prestage'));
+
+      // Package
+      } else if (
+        criteria.name === 'Packages Installed By Casper' ||
+        criteria.name === 'Packages Installed By Installer.app/SWU' ||
+        criteria.name === 'Cached Packages'
+      ) {
+        this.items.push(this.getCriteriaItem(id, name, criteria, type, 'package'));
+
+      // Configuration Profile
+      } else if (criteria.name === 'Profile Name') {
+        this.items.push(this.getCriteriaItem(id, name, criteria, type, 'configuration_profile'));
+      }
+    }
+  }
+
+  /**
    * Get all computer groups
    */
   getComputerGroups() {
     console.log('Get Computer Groups');
+    const type = 'computer_group';
     const records = this.jamf.getComputerGroups();
 
-    for (const record of records) {
-      const group = this.jamf.getComputerGroup(record.id);
-      if (group.is_smart === true) {
-        for (const criteria of group.criteria) {
-          // Computer Group
-          if (criteria.name === 'Computer Group') {
-            this.items.push(this.getCriteriaItem(group, criteria, 'computer_group'));
-
-          // PreStage Enrollment
-          } else if (criteria.name === 'Enrollment Method: PreStage enrollment') {
-            this.items.push(this.getCriteriaItem(group, criteria, 'computer_prestage'));
-
-          // Package
-          } else if (
-            criteria.name === 'Packages Installed By Casper' ||
-            criteria.name === 'Packages Installed By Installer.app/SWU' ||
-            criteria.name === 'Cached Packages'
-          ) {
-            this.items.push(this.getCriteriaItem(group, criteria, 'package'));
-
-          // Configuration Profile
-          } else if (criteria.name === 'Profile Name') {
-            this.items.push(this.getCriteriaItem(group, criteria, 'configuration_profile'));
-          }
-        }
+    for (const record_ of records) {
+      const record = this.jamf.getComputerGroup(record_.id);
+      if (record.is_smart === true) {
+        this.getCriteriaItems(type, record);
       }
     }
   }
@@ -132,36 +148,36 @@ class UsageReport {
     console.log('Get Policies');
     const records = this.jamf.getPolicies();
 
-    for (const record of records) {
-      const policy = this.jamf.getPolicy(record.id);
+    for (const record_ of records) {
+      const record = this.jamf.getPolicy(record_.id);
 
       // Computer Group - Targets
       this.addUsages(
-        policy.scope.computer_groups,
-        policy.general,
+        record.scope.computer_groups,
+        record.general,
         'policy',
         'computer_group',
         'scope:targets');
 
       // Computer Group - Exclusions
       this.addUsages(
-        policy.scope.exclusions.computer_groups,
-        policy.general,
+        record.scope.exclusions.computer_groups,
+        record.general,
         'policy',
         'computer_group',
         'scope:exclusions');
 
       // Script
       this.addUsages(
-        policy.scripts,
-        policy.general,
+        record.scripts,
+        record.general,
         'policy',
         'script');
 
       // Package
       this.addUsages(
-        policy.package_configuration.packages,
-        policy.general,
+        record.package_configuration.packages,
+        record.general,
         'policy',
         'package');
     }
@@ -174,24 +190,38 @@ class UsageReport {
     console.log('Get Configuration Profiles');
     const records = this.jamf.getConfigurationProfiles();
 
-    for (const record of records) {
-      const profile = this.jamf.getConfigurationProfile(record.id);
+    for (const record_ of records) {
+      const record = this.jamf.getConfigurationProfile(record_.id);
 
       // Computer Group - Targets
       this.addUsages(
-        profile.scope.computer_groups,
-        profile.general,
+        record.scope.computer_groups,
+        record.general,
         'configuration_profile',
         'computer_group',
         'scope:targets');
 
       // Computer Group - Exclusions
       this.addUsages(
-        profile.scope.exclusions.computer_groups,
-        profile.general,
+        record.scope.exclusions.computer_groups,
+        record.general,
         'configuration_profile',
         'computer_group',
         'scope:exclusions');
+    }
+  }
+
+  /**
+   * Get all advanced computer searches
+   */
+  getAdvancedComputerSearches() {
+    console.log('Get Advanced Computer Searches');
+    const type = 'advanced_computer_search';
+    const records = this.jamf.getAdvancedComputerSearches();
+
+    for (const record_ of records) {
+      const record = this.jamf.getAdvancedComputerSearch(record_.id);
+      this.getCriteriaItems(type, record);
     }
   }
 
@@ -201,14 +231,14 @@ class UsageReport {
   getComputerPrestages() {
     console.log('Get Computer Prestages');
     const records = this.jamf.getComputerPrestages();
-    for (const prestage of records) {
+    for (const record of records) {
       // Custom Packages
-      for (const id of prestage.customPackageIds) {
+      for (const id of record.customPackageIds) {
         const package_ = this.jamf.getPackage(id);
         const item = this.template('computer_prestage', 'package');
         Object.assign(item, {
-          id: prestage.id,
-          name: prestage.displayName,
+          id: record.id,
+          name: record.displayName,
           usage_id: package_.id,
           usage_name: package_.name
         });
@@ -216,12 +246,12 @@ class UsageReport {
       }
 
       // Configuration Profiles
-      for (const id of prestage.prestageInstalledProfileIds) {
+      for (const id of record.prestageInstalledProfileIds) {
         const profile = this.jamf.getConfigurationProfile(id);
         const item = this.template('computer_prestage', 'configuration_profile');
         Object.assign(item, {
-          id: prestage.id,
-          name: prestage.displayName,
+          id: record.id,
+          name: record.displayName,
           usage_id: profile.general.id,
           usage_name: profile.general.name
         });

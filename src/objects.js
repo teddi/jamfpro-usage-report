@@ -21,11 +21,14 @@ class JamfObject {
     this.jamf = new JamfClient();
     this.objects = [];
 
+    this.getCategories();
     this.getComputerGroups();
     this.getPolicies();
     this.getConfigurationProfiles();
+    this.getExtensionAttributes();
     this.getPackages();
     this.getScripts();
+    this.getAdvancedComputerSearches();
     this.getComputerPrestages();
   }
 
@@ -60,6 +63,15 @@ class JamfObject {
       Object.assign(_obj, record);
       this.objects.push(_obj);
     }
+  }
+
+  /**
+   * Get all categories
+   */
+  getCategories() {
+    console.log('Get Categories');
+    const records = this.jamf.getCategories();
+    this.addObjects('category', records);
   }
 
   /**
@@ -143,6 +155,33 @@ class JamfObject {
       });
     }
     this.addObjects('configuration_profile', records);
+  }
+
+  /**
+   * Get all extension attributes
+   */
+  getExtensionAttributes() {
+    console.log('Get Extension Attributes');
+    const records = [];
+    const records_ = this.jamf.getExtensionAttributes();
+    for (const record of records_) {
+      const r = this.jamf.getExtensionAttribute(record.id);
+      records.push({
+        id: r.id,
+        name: r.name,
+        enabled: r.enabled
+      });
+    }
+    this.addObjects('extension_attribute', records);
+  }
+
+  /**
+   * Get all advanced computer searches
+   */
+  getAdvancedComputerSearches() {
+    console.log('Get Advanced Computer Searches');
+    const records = this.jamf.getAdvancedComputerSearches();
+    this.addObjects('advanced_computer_search', records);
   }
 
   /**
