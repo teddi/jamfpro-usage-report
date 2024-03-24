@@ -20,6 +20,32 @@ class Spreadsheet { // eslint-disable-line no-unused-vars
   }
 
   /**
+   * Get value from object
+   * @param {Object} obj Object to inspect
+   * @param {string} key Key name
+   * @param {string|number} defaultValue Default value to return if key does not exist
+   * @return {string|number} Key value
+   */
+  getValue(obj, key, defaultValue = null) {
+    return obj?.[key] ?? defaultValue;
+  }
+
+  /**
+   * Make headers
+   * @param {Object} writeData Data to write
+   * @returns {Array} Headers
+   */
+  makeHeaders(writeData) {
+    const headers = new Set();
+    writeData.forEach((obj) => {
+      Object.keys(obj).forEach((key) => {
+        headers.add(key);
+      });
+    });
+    return [...headers];
+  }
+
+  /**
    * Write data to sheets in batches
    * @param {Object} writeData Data to write
    * @param {number} headerRowPos Header row position (default:1)
@@ -36,25 +62,17 @@ class Spreadsheet { // eslint-disable-line no-unused-vars
     this.sheet.clear();
 
     // Headers
-    const headers = [];
-    const headerData = Object.keys(writeData[0]);
-    for (let j = 0; j < headerData.length; j++) {
-      headers.push(headerData[j]);
-    }
+    const headers = this.makeHeaders(writeData);
     data.push(headers);
 
     // Values
-    for (let i = 0; i < writeData.length; i++) {
+    writeData.forEach((item) => {
       const values = [];
-      const rowData = writeData[i];
-      const keys = Object.keys(rowData);
-      for (let j = 0; j < keys.length; j++) {
-        const key = keys[j];
-        const val = rowData[key];
-        values.push(val);
-      }
+      headers.forEach((key) => {
+        values.push(this.getValue(item, key, ''));
+      });
       data.push(values);
-    }
+    });
 
     // Write data
     this.sheet.getRange(headerRowPos, 1, data.length, headers.length).setValues(data);
