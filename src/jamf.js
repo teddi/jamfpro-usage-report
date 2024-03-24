@@ -333,7 +333,7 @@ class JamfProApi extends Request {
 /**
  * Class representing a Jamf Client
  */
-class JamfClient { // eslint-disable-line no-unused-vars
+class JamfClient {
   constructor() {
     const properties = PropertiesService.getScriptProperties().getProperties();
     const server = properties.SERVER;

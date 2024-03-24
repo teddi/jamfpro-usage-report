@@ -1,8 +1,7 @@
 /**
  * Update the Jamf Pro objects sheet
  */
-function updateObjects() { // eslint-disable-line no-unused-vars
-  // eslint-disable-next-line no-undef
+function updateObjects() {
   const spreadsheet = new Spreadsheet('Objects');
 
   console.log('Update Objects');
@@ -17,7 +16,6 @@ function updateObjects() { // eslint-disable-line no-unused-vars
  */
 class JamfObject {
   constructor() {
-    // eslint-disable-next-line no-undef
     this.jamf = new JamfClient();
     this.objects = [];
 

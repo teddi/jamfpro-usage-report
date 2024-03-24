@@ -1,7 +1,7 @@
 /**
  * Class to handle Google Sheets
  */
-class Spreadsheet { // eslint-disable-line no-unused-vars
+class Spreadsheet {
   constructor(sheetName = null) {
     this.spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
 

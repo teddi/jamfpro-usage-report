@@ -1,8 +1,7 @@
 /**
  * Update the Jamf Pro objects usage report
  */
-function updateReport() { // eslint-disable-line no-unused-vars
-  // eslint-disable-next-line no-undef
+function updateReport() {
   const spreadsheet = new Spreadsheet('Report');
 
   console.log('Update Objects');
@@ -17,7 +16,6 @@ function updateReport() { // eslint-disable-line no-unused-vars
  */
 class UsageReport {
   constructor() {
-    // eslint-disable-next-line no-undef
     this.jamf = new JamfClient();
     this.items = [];
 
