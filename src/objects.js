@@ -45,6 +45,8 @@ class JamfObject {
       is_smart: null,
       category: null,
       enabled: null,
+      frequency: null,
+      trigger: null,
       scope_targets: null,
       scope_limitations: null,
       scope_exclusions: null
@@ -81,6 +83,38 @@ class JamfObject {
     console.log('Get Computer Groups');
     const records = this.jamf.getComputerGroups();
     this.addObjects('computer_group', records);
+  }
+
+  /**
+   * Make a list of trigger
+   * @param {Object} general General object
+   * @param {boolean} selfServiceEnabled Self Service enabled
+   * @returns {string} Comma-separated list of triggers
+   */
+  makeTriggerList(general, selfServiceEnabled) {
+    const triggers = [];
+    if (general.trigger_checkin) {
+      triggers.push('Check-in');
+    }
+    if (general.trigger_enrollment_complete) {
+      triggers.push('Enrollment');
+    }
+    if (general.trigger_login) {
+      triggers.push('Login');
+    }
+    if (general.trigger_network_state_changed) {
+      triggers.push('Network State Change');
+    }
+    if (general.trigger_startup) {
+      triggers.push('Startup');
+    }
+    if (general.trigger_other) {
+      triggers.push(general.trigger_other);
+    }
+    if (selfServiceEnabled) {
+      triggers.push('Self Service');
+    }
+    return triggers.join(', ');
   }
 
   /**
@@ -128,6 +162,8 @@ class JamfObject {
         name: r.general.name,
         category: r.general.category.name,
         enabled: r.general.enabled,
+        frequency: r.general.frequency,
+        trigger: this.makeTriggerList(r.general, r.self_service.use_for_self_service),
         scope_targets: this.makeScopeList(r.scope),
         scope_limitations: this.makeScopeList(r.scope.limitations),
         scope_exclusions: this.makeScopeList(r.scope.exclusions)
