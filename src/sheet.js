@@ -17,6 +17,9 @@ class Spreadsheet {
     } else {
       this.sheet = this.spreadsheet.getActiveSheet();
     }
+
+    // Sheet activate
+    this.sheet.activate();
   }
 
   /**
