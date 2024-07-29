@@ -1,10 +1,11 @@
 /**
  * Get the value of the property and check if the property is set.
  * @param {string} property Property
+ * @param {boolean} throwIfUndefined Throw an error if the property is not set
  */
-function getProperty_(property) {
+function getProperty_(property, throwIfUndefined = true) {
   const properties = PropertiesService.getScriptProperties().getProperties();
-  if (properties[property] === undefined) {
+  if (throwIfUndefined && !properties[property]) {
     throw new Error(`Please set properties.${property}`);
   }
   return properties[property];
@@ -96,7 +97,7 @@ class Auth extends Request {
    * @param {string} clientSecret Client Secret
    * @returns {Object} Authentication
    */
-  apiClientAuth(clientId, clientSecret) {
+  apiClientAuth_(clientId, clientSecret) {
     const url = `${this.baseUrl}/api/oauth/token`;
     const headers = {
       Accept: 'application/json'
@@ -111,13 +112,41 @@ class Auth extends Request {
   }
 
   /**
+   * Basic Authentication
+   * @param {string} username Username
+   * @param {string} password Password
+   * @returns {Object} Authentication
+   */
+  basicAuth_(username, password) {
+    const url = `${this.baseUrl}/api/v1/auth/token`;
+    const credential = Utilities.base64Encode(`${username}:${password}`);
+    const headers = {
+      Authorization: `Basic ${credential}`,
+      Accept: 'application/json'
+    };
+    const payload = {};
+    const key = 'token';
+    return { url, headers, payload, key };
+  }
+
+  /**
    * Get Access Token
    * @returns {string} Access Token
    */
   getToken() {
-    const clientId = getProperty_('CLIENT_ID');
-    const clientSecret = getProperty_('CLIENT_SECRET');
-    const auth = this.apiClientAuth(clientId, clientSecret);
+    const authMethod = getProperty_('AUTH_METHOD', false);
+    let auth;
+    if (!authMethod || authMethod === 'oauth2') {
+      const clientId = getProperty_('CLIENT_ID');
+      const clientSecret = getProperty_('CLIENT_SECRET');
+      auth = this.apiClientAuth_(clientId, clientSecret);
+    } else if (authMethod === 'basic') {
+      const username = getProperty_('USERNAME');
+      const password = getProperty_('PASSWORD');
+      auth = this.basicAuth_(username, password);
+    } else {
+      throw new Error(`Invalid auth method: ${authMethod}`);
+    }
     const res = this.request('post', auth.url, auth.headers, auth.payload);
     return res[auth.key];
   }
