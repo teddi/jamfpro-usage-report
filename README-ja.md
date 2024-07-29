@@ -59,8 +59,11 @@ Jamf Pro で以下の権限を含んだAPIロールを作成し、そのロー�
 - スクリプトプロパティを編集 をクリックします
 - 以下のプロパティを追加します
   - `SERVER`: e.g. mycompany.jamfcloud.com
-  - `CLIENT_ID`: 作成したAPIクライアントのクライアントID
-  - `CLIENT_SECRET`: 作成したAPIクライアントのクライアントシークレット
+  - `AUTH_METHDO`: oauth2 or basic (未設定の場合は oauth2)
+  - `CLIENT_ID`: 作成したAPIクライアントのクライアントID (AUTH_METHOD: oauth2)
+  - `CLIENT_SECRET`: 作成したAPIクライアントのクライアントシークレット  (AUTH_METHOD: oauth2)
+  - `USERNAME`: Basic認証を行う Jamf Pro ユーザー名 (AUTH_METHOD: basic)
+  - `PASSWORD`: Basic認証を行う Jamf Pro ユーザーのパスワード (AUTH_METHOD: basic)
 
 ## レポートの作成
 

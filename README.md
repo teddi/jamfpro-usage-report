@@ -59,9 +59,11 @@ Create an API role in Jamf Pro that includes the following permissions, and crea
 - Click Edit Script Properties
 - Add the following properties
   - `SERVER`: e.g. mycompany.jamfcloud.com
-  - `CLIENT_ID`: Client ID of the API client you created.
-  - `CLIENT_SECRET`: Client secret of the created API client.
-
+  - `CLIENT_ID`: Client ID of the API client you created. (AUTH_METHOD: oauth2)
+  - `CLIENT_SECRET`: Client secret of the created API client. (AUTH_METHOD: oauth2)
+  - `AUTH_METHDO`: oauth2 or basic (oauth2 if undefined)
+  - `USERNAME`: The Jamf Pro username for Basic authentication (AUTH_METHOD: basic)
+  - `PASSWORD`: Password for the Jamf Pro user for basic authentication (AUTH_METHOD: basic)
 ## Create a report
 
 - Open the spreadsheet
