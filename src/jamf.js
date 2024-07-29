@@ -1,17 +1,13 @@
 /**
- * Determine if a property is defined
- * @param {*} property
- * @returns {boolean}
+ * Get the value of the property and check if the property is set.
+ * @param {string} property Property
  */
-function isDefined(property) {
-  return (typeof property !== 'undefined');
-}
-
-/**
- * Alert if property is not defined
- */
-function alertNotSetProperty() {
-  throw new Error('Property is not set');
+function getProperty_(property) {
+  const properties = PropertiesService.getScriptProperties().getProperties();
+  if (properties[property] === undefined) {
+    throw new Error(`Please set properties.${property}`);
+  }
+  return properties[property];
 }
 
 /**
@@ -119,12 +115,8 @@ class Auth extends Request {
    * @returns {string} Access Token
    */
   getToken() {
-    const properties = PropertiesService.getScriptProperties().getProperties();
-    const clientId = properties.CLIENT_ID;
-    const clientSecret = properties.CLIENT_SECRET;
-    if (!(isDefined(clientId) && isDefined(clientSecret))) {
-      alertNotSetProperty();
-    }
+    const clientId = getProperty_('CLIENT_ID');
+    const clientSecret = getProperty_('CLIENT_SECRET');
     const auth = this.apiClientAuth(clientId, clientSecret);
     const res = this.request('post', auth.url, auth.headers, auth.payload);
     return res[auth.key];
@@ -335,11 +327,7 @@ class JamfProApi extends Request {
  */
 class JamfClient {
   constructor() {
-    const properties = PropertiesService.getScriptProperties().getProperties();
-    const server = properties.SERVER;
-    if (!(isDefined(server))) {
-      alertNotSetProperty();
-    }
+    const server = getProperty_('SERVER');
     const baseUrl = `https://${server}`;
     const auth = new Auth(baseUrl);
     const token = auth.getToken();
